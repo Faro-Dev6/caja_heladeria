@@ -49,3 +49,18 @@ Aplicación web desarrollada para la administración integral de una heladería,
 ---
 
 ## 📁 Estructura del proyecto
+
+📦 heladeria-app
+┣ 📂 public
+┃ ┣ 📂 css
+┃ ┣ 📂 js
+┃ ┗ 📂 assets
+┣ 📂 src
+┃ ┣ 📂 routes
+┃ ┣ 📂 controllers
+┃ ┣ 📂 models
+┃ ┗ 📂 services
+┣ 📂 database
+┣ 📄 app.js
+┣ 📄 package.json
+┗ 📄 README.md

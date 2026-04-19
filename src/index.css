@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  
+  --color-pos-creamy: #FFFDF5;
+  --color-pos-vanilla: #FEFAE0;
+  --color-pos-pink: #FDE2E4;
+  --color-pos-blue: #A2D2FF;
+  --color-pos-mint: #B7E4C7;
+  
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-confirm: 0 10px 20px -5px rgba(162, 210, 255, 0.5);
+}
+
+body {
+  @apply bg-pos-creamy text-[#333] antialiased;
+}

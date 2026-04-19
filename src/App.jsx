@@ -16,15 +16,14 @@ import {
   CircleOff,
   History,
   Lock,
-  Plus,
+  Plus, 
   Minus,
   Trash2,
   CheckCircle2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Product, OrderItem, Sale } from './types';
 
-const PRODUCTS: Product[] = [
+const PRODUCTS = [
   { id: '1', name: 'Helado Vainilla', price: 4.50, category: 'Ice Cream', icon: 'IceCream' },
   { id: '2', name: 'Helado Chocolate', price: 4.50, category: 'Ice Cream', icon: 'IceCream' },
   { id: '3', name: 'Paleta Menta', price: 3.25, category: 'Ice Cream', icon: 'IceCreamCone' },
@@ -39,7 +38,7 @@ const PRODUCTS: Product[] = [
   { id: '12', name: 'Donut Glaseado', price: 2.00, category: 'Pastry', icon: 'Donut' },
 ];
 
-const IconMap: Record<string, any> = {
+const IconMap = {
   IceCream,
   IceCreamCone,
   Cake,
@@ -52,8 +51,8 @@ const IconMap: Record<string, any> = {
 };
 
 export default function App() {
-  const [order, setOrder] = useState<OrderItem[]>([]);
-  const [sales, setSales] = useState<Sale[]>([
+  const [order, setOrder] = useState([]);
+  const [sales, setSales] = useState([
     { id: '101', timestamp: '14:35', total: 15.50, items: [] },
     { id: '100', timestamp: '13:20', total: 8.75, items: [] },
     { id: '099', timestamp: '12:45', total: 22.00, items: [] },
@@ -62,7 +61,7 @@ export default function App() {
   const subtotal = useMemo(() => order.reduce((sum, item) => sum + (item.price * item.quantity), 0), [order]);
   const total = subtotal; // For now no tax for simplicity in visual design
 
-  const addToOrder = (product: Product) => {
+  const addToOrder = (product) => {
     setOrder(prev => {
       const existing = prev.find(item => item.productId === product.id);
       if (existing) {
@@ -81,11 +80,11 @@ export default function App() {
     });
   };
 
-  const removeFromOrder = (productId: string) => {
+  const removeFromOrder = (productId) => {
     setOrder(prev => prev.filter(item => item.productId !== productId));
   };
 
-  const updateQuantity = (productId: string, delta: number) => {
+  const updateQuantity = (productId, delta) => {
     setOrder(prev => prev.map(item => {
       if (item.productId === productId) {
         const nextQty = item.quantity + delta;
@@ -98,7 +97,7 @@ export default function App() {
   const confirmOrder = () => {
     if (order.length === 0) return;
     
-    const newSale: Sale = {
+    const newSale = {
       id: Math.floor(Math.random() * 1000).toString(),
       timestamp: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
       total,

@@ -6,7 +6,10 @@
 import { useState, useMemo } from 'react';
 import { 
   IceCream, 
-  IceCreamCone, 
+  IceCreamCone,
+  IceCreamBowl,
+  Popsicle,
+  Bike, 
   Cake, 
   Candy, 
   Lollipop, 
@@ -22,20 +25,23 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import Swal from 'sweetalert2';
+import { v4 as uuidv4 } from 'uuid';
+import { showPaymentAlert, showSuccessAlert } from './utils/alerts';
 
 const PRODUCTS = [
-  { id: '1', name: 'Helado Vainilla', price: 4.50, category: 'Ice Cream', icon: 'IceCream' },
-  { id: '2', name: 'Helado Chocolate', price: 4.50, category: 'Ice Cream', icon: 'IceCream' },
-  { id: '3', name: 'Paleta Menta', price: 3.25, category: 'Ice Cream', icon: 'IceCreamCone' },
-  { id: '4', name: 'Muffin Fresa', price: 3.75, category: 'Pastry', icon: 'Cake' },
-  { id: '5', name: 'Algodón Azúcar', price: 2.50, category: 'Candy', icon: 'Candy' },
-  { id: '6', name: 'Ositos Goma', price: 1.50, category: 'Candy', icon: 'Cherry' },
-  { id: '7', name: 'Popcorn Caramelo', price: 3.00, category: 'Candy', icon: 'Cookie' },
-  { id: '8', name: 'Sorbet Blue', price: 4.00, category: 'Ice Cream', icon: 'IceCream' },
-  { id: '9', name: 'Cake Macarons', price: 8.50, category: 'Pastry', icon: 'Cake' },
-  { id: '10', name: 'Paleta Arcoiris', price: 2.25, category: 'Candy', icon: 'Lollipop' },
-  { id: '11', name: 'Cucurucho Suave', price: 3.50, category: 'Ice Cream', icon: 'IceCreamCone' },
-  { id: '12', name: 'Donut Glaseado', price: 2.00, category: 'Pastry', icon: 'Donut' },
+  { id: '1', name: '1 Kg', price: 18000, category: 'Ice Cream', icon: 'IceCreamBowl', weightInGrams: 1000},
+  { id: '2', name: '1/2 kg', price: 10500, category: 'Ice Cream', icon: 'IceCreamBowl', weightInGrams: 500 },
+  { id: '3', name: '1/4 kg', price: 6500, category: 'Ice Cream', icon: 'IceCreamBowl', weightInGrams: 250 },
+  { id: '4', name: '1 bocha', price: 2000, category: 'Ice Cream', icon: 'IceCream', weightInGrams: 50 },
+  { id: '5', name: '2 Bocha', price: 3500, category: 'Ice Cream', icon: 'IceCream', weightInGrams: 100 },
+  { id: '6', name: '3 bochas', price: 4000, category: 'Ice Cream', icon: 'IceCream', weightInGrams: 150 },
+  { id: '7', name: 'Paleta Grande crema', price: 4500, category: 'Ice Cream', icon: 'Popsicle', weightInGrams: 0 },
+  { id: '8', name: 'Paleta Grande Agua', price: 4000, category: 'Ice Cream', icon: 'Popsicle', weightInGrams: 0 },
+  { id: '9', name: 'Paleta Chica', price: 3500, category: 'Ice Cream', icon: 'Popsicle', weightInGrams: 0 },
+  { id: '10', name: 'gio', price: 10000, category: 'Candy', icon: 'Lollipop', weightInGrams: 0 },
+  { id: '11', name: 'delivery urbano', price: 2000, category: 'Ice Cream', icon: 'Bike', weightInGrams: 0 },
+  { id: '12', name: 'Delivery ', price: 3000, category: 'Pastry', icon: 'Bike', weightInGrams: 0 },
 ];
 
 const IconMap = {
@@ -47,13 +53,16 @@ const IconMap = {
   Cookie,
   Donut,
   Cherry,
+  Popsicle,
+  IceCreamBowl,
+  Bike,
   Grape: CircleOff // Fallback
 };
 
 export default function App() {
   const [order, setOrder] = useState([]);
   const [sales, setSales] = useState([
-    { id: '101', timestamp: '14:35', total: 15.50, items: [] },
+    { id: '101', timestamp: '14:35', total: 15.50, items: [] },//ventas de ejemplo para mostrar en el historial
     { id: '100', timestamp: '13:20', total: 8.75, items: [] },
     { id: '099', timestamp: '12:45', total: 22.00, items: [] },
   ]);
@@ -71,10 +80,11 @@ export default function App() {
         );
       }
       return [...prev, { 
-        id: Math.random().toString(36).substr(2, 9),
+        id: uuidv4(),
         productId: product.id,
         name: product.name,
         price: product.price,
+        weightInGrams: product.weightInGrams,
         quantity: 1
       }];
     });
@@ -94,19 +104,33 @@ export default function App() {
     }));
   };
 
-  const confirmOrder = () => {
-    if (order.length === 0) return;
-    
-    const newSale = {
-      id: Math.floor(Math.random() * 1000).toString(),
-      timestamp: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-      total,
-      items: [...order]
-    };
+const confirmOrder = async () => {
+  if (order.length === 0) return;
 
-    setSales(prev => [newSale, ...prev]);
-    setOrder([]);
+  const result = await showPaymentAlert(subtotal);
+
+  if (!result.isConfirmed || !result.value) return;
+
+  const paymentMethod = result.value;
+  
+  let finalTotal = subtotal;
+  if (paymentMethod === 'credito') {
+    finalTotal = subtotal * 1.07;
+  }
+
+  const newSale = {
+    id: uuidv4().split('-')[0].toUpperCase(),
+    timestamp: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+    total: finalTotal,
+    method: paymentMethod,
+    items: [...order]
   };
+
+  setSales(prev => [newSale, ...prev]);
+  setOrder([]);
+  
+  showSuccessAlert(finalTotal);
+};
 
   return (
     <div className="flex h-screen w-full p-6 gap-6 bg-pos-creamy">
@@ -117,7 +141,7 @@ export default function App() {
           <div className="w-8 h-8 bg-pink-300 rounded-full flex items-center justify-center text-white">
             <IceCream size={18} strokeWidth={2.5} />
           </div>
-          <h1 className="text-xl font-bold tracking-tight text-gray-700">SWEET TREATS POS</h1>
+          <h1 className="text-xl font-bold tracking-tight text-gray-700">Caja Heladeria</h1>
         </header>
 
         {/* Product Grid */}

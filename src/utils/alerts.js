@@ -42,7 +42,7 @@ didOpen: () => {
         if (selectedValue === 'credito') {
           const totalConRecargo = subtotal * 1.07;
           totalDisplay.innerText = `$${totalConRecargo.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
-          totalDisplay.classList.add('text-pink-600'); // Resaltamos el precio nuevo
+          totalDisplay.classList.add('text-pink-600'); 
           extraInfo.innerHTML = '<span class="text-xs text-pink-400 font-bold">INCLUYE 7% RECARGO</span>';
         } else {
           totalDisplay.innerText = `$${subtotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
@@ -68,5 +68,19 @@ export const showSuccessAlert = (totalFinal) => {
     showConfirmButton: false,
     background: "#FFFDF2",
     iconColor: "#B9FBC0",
+  });
+};
+
+export const showCloseDayAlert = () => {
+  return Swal.fire({
+    title: '¿Cerrar caja?',
+    text: "Se generará el reporte PDF y se vaciará el historial.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#B9FBC0', 
+    cancelButtonColor: '#ff9494',  
+    confirmButtonText: 'Sí, cerrar día',
+    cancelButtonText: 'Cancelar',
+    reverseButtons: true 
   });
 };

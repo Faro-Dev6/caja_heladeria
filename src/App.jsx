@@ -27,7 +27,8 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import Swal from 'sweetalert2';
 import { v4 as uuidv4 } from 'uuid';
-import { showPaymentAlert, showSuccessAlert } from './utils/alerts';
+import { showPaymentAlert, showSuccessAlert, showCloseDayAlert } from './utils/alerts';
+import { generateClosingPDF } from './utils/pdfGenerator';
 
 const PRODUCTS = [
   { id: '1', name: '1 Kg', price: 18000, category: 'Ice Cream', icon: 'IceCreamBowl', weightInGrams: 1000},
@@ -37,11 +38,14 @@ const PRODUCTS = [
   { id: '5', name: '2 Bocha', price: 3500, category: 'Ice Cream', icon: 'IceCream', weightInGrams: 100 },
   { id: '6', name: '3 bochas', price: 4000, category: 'Ice Cream', icon: 'IceCream', weightInGrams: 150 },
   { id: '7', name: 'Paleta Grande crema', price: 4500, category: 'Ice Cream', icon: 'Popsicle', weightInGrams: 0 },
-  { id: '8', name: 'Paleta Grande Agua', price: 4000, category: 'Ice Cream', icon: 'Popsicle', weightInGrams: 0 },
-  { id: '9', name: 'Paleta Chica', price: 3500, category: 'Ice Cream', icon: 'Popsicle', weightInGrams: 0 },
+  { id: '8', name: 'Paleta Grande Agua', price: 3500, category: 'Ice Cream', icon: 'Popsicle', weightInGrams: 0 },
+  { id: '9', name: 'Paleta Chica', price: 3000, category: 'Ice Cream', icon: 'Popsicle', weightInGrams: 0 },
   { id: '10', name: 'gio', price: 10000, category: 'Candy', icon: 'Lollipop', weightInGrams: 0 },
   { id: '11', name: 'delivery urbano', price: 2000, category: 'Ice Cream', icon: 'Bike', weightInGrams: 0 },
   { id: '12', name: 'Delivery ', price: 3000, category: 'Pastry', icon: 'Bike', weightInGrams: 0 },
+  { id: '13', name: 'cucurucho', price: 300, category: 'Ice Cream', icon: 'IceCream', weightInGrams: 0 },
+  { id: '14', name: 'vasito', price: 150, category: 'Ice Cream', icon: 'IceCream', weightInGrams: 0 },
+  { id: '15', name: '3x2 1/4 kg', price: 13000, category: 'Ice Cream', icon: 'IceCreamBowl', weightInGrams: 750 },
 ];
 
 const IconMap = {
@@ -61,11 +65,7 @@ const IconMap = {
 
 export default function App() {
   const [order, setOrder] = useState([]);
-  const [sales, setSales] = useState([
-    { id: '101', timestamp: '14:35', total: 15.50, items: [] },//ventas de ejemplo para mostrar en el historial
-    { id: '100', timestamp: '13:20', total: 8.75, items: [] },
-    { id: '099', timestamp: '12:45', total: 22.00, items: [] },
-  ]);
+  const [sales, setSales] = useState([]);
 
   const subtotal = useMemo(() => order.reduce((sum, item) => sum + (item.price * item.quantity), 0), [order]);
   const total = subtotal; // For now no tax for simplicity in visual design
@@ -117,20 +117,49 @@ const confirmOrder = async () => {
   if (paymentMethod === 'credito') {
     finalTotal = subtotal * 1.07;
   }
+  const totalWeightGrams = order.reduce((sum, item) => sum + (item.weightInGrams * item.quantity), 0);
 
   const newSale = {
     id: uuidv4().split('-')[0].toUpperCase(),
+    orderNumber: sales.length + 1,
     timestamp: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
     total: finalTotal,
     method: paymentMethod,
-    items: [...order]
+    items: [...order],
+    totalWeightGrams: totalWeightGrams
   };
 
   setSales(prev => [newSale, ...prev]);
   setOrder([]);
-  
   showSuccessAlert(finalTotal);
 };
+
+const handleCloseDay = async () => {
+    if (sales.length === 0) {
+      Swal.fire({
+        title: "Caja vacía",
+        text: "No hay ventas para cerrar.",
+        icon: "info",
+        confirmButtonColor: '#F9A8D4'
+      });
+      return;
+    }
+
+    const result = await showCloseDayAlert();
+
+    if (result.isConfirmed) {
+      generateClosingPDF(sales); 
+      setSales([]);            
+      
+      Swal.fire({
+        title: '¡Caja Cerrada!',
+        text: 'El reporte se ha descargado correctamente.',
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    }
+  };
 
   return (
     <div className="flex h-screen w-full p-6 gap-6 bg-pos-creamy">
@@ -145,7 +174,7 @@ const confirmOrder = async () => {
         </header>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-3 gap-3 overflow-y-auto pr-2">
+        <div className="grid grid-cols-5 gap-2 overflow-y-auto pr-1">
           {PRODUCTS.map((product) => {
             const Icon = IconMap[product.icon] || IceCream;
             return (
@@ -153,9 +182,9 @@ const confirmOrder = async () => {
                 key={product.id}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => addToOrder(product)}
-                className="bg-pos-vanilla rounded-xl border border-orange-100 flex flex-col items-center justify-center p-3 shadow-card hover:bg-orange-50 transition-colors group aspect-[4/3]"
+                className="bg-pos-vanilla rounded-xl border border-orange-100 flex flex-col items-center justify-center p-2 shadow-card hover:bg-orange-50 transition-colors group h-[90px]"
               >
-                <Icon className="mb-1 text-pink-400 group-hover:scale-110 transition-transform" size={28} strokeWidth={2} />
+                <Icon className="mb-1 text-pink-400 group-hover:scale-110 transition-transform" size={22} strokeWidth={2} />
                 <span className="text-[10px] uppercase font-bold text-gray-400">{product.name}</span>
                 <span className="text-sm font-black text-gray-800 tracking-tight">${product.price.toFixed(2)}</span>
               </motion.button>
@@ -226,7 +255,10 @@ const confirmOrder = async () => {
         
         <div className="flex-1 flex flex-col overflow-y-auto pr-1">
           <AnimatePresence initial={false}>
-            {sales.map((sale) => (
+            {sales.length === 0 ? (
+              <p className="text-[10px] text-center text-gray-400 mt-10">No hay ventas registradas</p>
+            ) : (
+            sales.map((sale) => (
               <motion.div
                 key={sale.id}
                 initial={{ opacity: 0, x: 20 }}
@@ -235,19 +267,20 @@ const confirmOrder = async () => {
               >
                 <div className="flex justify-between text-xs text-gray-400 mb-1">
                   <span>{sale.timestamp}</span>
-                  <span className="font-mono">#{sale.id}</span>
+                  <span className="text-pink-400">ORDEN #{String(sale.orderNumber).padStart(3, '0')}</span>
                 </div>
                 <div className="flex justify-between font-bold text-gray-700">
                   <span className="text-sm">Venta ID: {sale.id}</span>
                   <span className="text-sm">${sale.total.toFixed(2)}</span>
                 </div>
               </motion.div>
-            ))}
+            )))}
           </AnimatePresence>
         </div>
 
         <motion.button
           whileTap={{ scale: 0.98 }}
+          onClick={handleCloseDay}
           className="bg-pos-mint text-gray-700 font-bold py-3 mt-4 rounded-2xl flex items-center justify-center gap-2 border border-green-200/50 hover:bg-green-200 transition-colors"
         >
           <Lock size={16} />

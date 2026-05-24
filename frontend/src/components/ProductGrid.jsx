@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { IceCream } from 'lucide-react';
 
-import { IconMap } from '../utils/iconMap';
+import { IconMap } from '../utils/iconmap';
 
 export const ProductGrid = ({
   products,

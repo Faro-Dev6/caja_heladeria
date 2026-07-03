@@ -1,7 +1,7 @@
 export const PRODUCTS = [
-  { id: '1', name: '1 Kg', price: 18000, category: 'Ice Cream', icon: 'IceCreamBowl', weightInGrams: 1000},
-  { id: '2', name: '1/2 kg', price: 10500, category: 'Ice Cream', icon: 'IceCreamBowl', weightInGrams: 500 },
-  { id: '3', name: '1/4 kg', price: 6500, category: 'Ice Cream', icon: 'IceCreamBowl', weightInGrams: 250 },
+  { id: '1', name: '1 Kg', price: 18500, category: 'Ice Cream', icon: 'IceCreamBowl', weightInGrams: 1000},
+  { id: '2', name: '1/2 kg', price: 11000, category: 'Ice Cream', icon: 'IceCreamBowl', weightInGrams: 500 },
+  { id: '3', name: '1/4 kg', price: 7000, category: 'Ice Cream', icon: 'IceCreamBowl', weightInGrams: 250 },
   { id: '4', name: '1 bocha', price: 2000, category: 'Ice Cream', icon: 'IceCream', weightInGrams: 50 },
   { id: '5', name: '2 Bocha', price: 3500, category: 'Ice Cream', icon: 'IceCream', weightInGrams: 100 },
   { id: '6', name: '3 bochas', price: 4000, category: 'Ice Cream', icon: 'IceCream', weightInGrams: 150 },
@@ -14,4 +14,5 @@ export const PRODUCTS = [
   { id: '13', name: 'cucurucho', price: 300, category: 'Ice Cream', icon: 'IceCream', weightInGrams: 0 },
   { id: '14', name: 'vasito', price: 150, category: 'Ice Cream', icon: 'IceCream', weightInGrams: 0 },
   { id: '15', name: 'Promo Mund', price: 25000, category: 'Ice Cream', icon: 'IceCreamBowl', weightInGrams: 1500 },
+  { id: '16', name: '3x2 1/4 kg', price: 13000, category: 'Ice Cream', icon: 'IceCreamBowl', weightInGrams: 750 }
 ];

@@ -14,5 +14,5 @@ export const PRODUCTS = [
   { id: '13', name: 'cucurucho', price: 300, category: 'Ice Cream', icon: 'IceCream', weightInGrams: 0 },
   { id: '14', name: 'vasito', price: 150, category: 'Ice Cream', icon: 'IceCream', weightInGrams: 0 },
   { id: '15', name: 'Promo Mund', price: 25000, category: 'Ice Cream', icon: 'IceCreamBowl', weightInGrams: 1500 },
-  { id: '16', name: '3x2 1/4 kg', price: 13000, category: 'Ice Cream', icon: 'IceCreamBowl', weightInGrams: 750 }
+  { id: '16', name: '3x2 1/4 kg', price: 14000, category: 'Ice Cream', icon: 'IceCreamBowl', weightInGrams: 750 }
 ];
